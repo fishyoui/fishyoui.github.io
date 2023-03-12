@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>猜数字</title>
+  <style>
+    /* CSS 样式 */
+    .input-box {
+      padding: 10px;
+      font-size: 16px;
+    }
+    
+    .button {
+      padding: 10px;
+      font-size: 16px;
+    }
+    
+    #result {
+      margin-top: 20px;
+      font-size: 24px;
+    }
+    
+    #coins {
+      margin-top: 20px;
+      font-size: 20px;
+    }
+    
+    .disabled {
+      color: #999; /* 禁用状态下的颜色 */
+      cursor: not-allowed; /* 禁用鼠标事件 */
+    }
+  </style>
+</head>
+<body>
+  <h1>欢迎来到猜数字游戏！</h1>
+  <p>请在下方输入一个 0 到 114514 的整数。</p>
+  <input type="text" id="guessInput" class="input-box">
+  <button type="button" onclick="checkGuess()" class="button">猜！</button>
+  <div id="result"></div>
+  <div id="coins" class="coins">金币：10</div>
+  <button type="button" onclick="buyAnswer()" class="button buy-button">花费 10 个金币购买答案</button>
+  <br>
+  <button type="button" onclick="restart()" class="button restart-button">重新开始</button>
+
+  <script>
+    // 生成随机数
+    var randomNumber = Math.floor(Math.random() * 114515);
+    console.log("答案：" + randomNumber);
+
+    // 初始化剩余次数，金币和是否购买答案
+    var remainingGuesses = 5;
+    var coins = 10;
+    var answerBought = false;
+
+    // 获取 DOM 元素
+    function get(id) {
+      return document.getElementById(id);
+    }
+
+    // 处理玩家猜测
+    function checkGuess() {
+      var guessInput = get("guessInput");
+      var guess = parseInt(guessInput.value);
+
+      // 检测玩家输入的猜测是否有效
+      if (isNaN(guess) || guess < 0 || guess > 114514) {
+        alert("请输入 0 到 114514 的整数！");
+        return;
+      }
+
+      // 更新剩余次数
+      remainingGuesses--;
+
+      // 判断玩家是否猜对
+      if (guess === randomNumber) {
+        showResult("恭喜你，你猜对了！", 10);
+      } else if (remainingGuesses === 0) {
+        showResult("很遗憾，你已经用完所有的猜测机会！答案是 " + randomNumber + "。", 1);
+      } else if (guess < randomNumber) {
+        if (remainingGuesses > 0) {
+          showResult("你猜小了！还有 " + remainingGuesses + " 次机会。", 1);
+        }
+      } else {
+        if (remainingGuesses > 0) {
+          showResult("你猜大了！还有 " + remainingGuesses + " 次机会。", 1);
+        }
+      }
+
+      // 清空输入框
+      guessInput.value = "";
+    }
+
+    // 显示结果并更新金币数量
+    function showResult(message, reward) {
+      var resultDiv = get("result");
+      resultDiv.innerHTML = message;
+
+      // 更新金币数量
+      coins += reward;
+      var coinsDiv =get("coins");
+     coinsDiv.innerHTML = "金币：" + coins; // 如果猜对了，禁用按钮
+  if (reward === 10) {
+    disableButton(get("guessButton"));
+  }
+}
+
+     // 购买答案
+    function buyAnswer() {
+  // 检查是否已购买答案或金币不足
+  if (answerBought || coins < 5) {
+    return;
+  }
+
+  // 更新金币数量和标志位
+  coins -= 5;
+  answerBought = true;
+
+  // 显示答案
+  showResult("答案是 " + randomNumber + "。", -5);
+
+  // 禁用答案购买按钮
+  disableButton(get("buyButton"));
+}
+
+// 重新开始游戏
+function restart() {
+  // 生成新的随机数，并初始化状态变量
+  randomNumber = Math.floor(Math.random() * 114515);
+  console.log("答案：" + randomNumber);
+  remainingGuesses = 5;
+  answerBought = false;
+
+  // 清空结果显示区域和输入框
+  get("result").innerHTML = "";
+  get("guessInput").value = "";
+
+  // 重置按钮状态
+  enableButton(get("guessButton"));
+  enableButton(get("buyButton"));
+
+  // 设置金币数量为原始值
+  get("coins").innerHTML = "金币：" + coins;
+}
+
+// 禁用按钮
+function disableButton(button) {
+  button.disabled = true;
+  button.classList.add("disabled");
+}
+
+// 启用按钮
+function enableButton(button) {
+  button.disabled = false;
+  button.classList.remove("disabled");
+}
+</script>
+</body>
+</html>
