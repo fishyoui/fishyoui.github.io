@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>My Diary</title>
+  <h1>欢迎来到我的日记！</h1>
+  <style>
+    /* 样式表 */
+  </style>
+</head>
+<link href="https://fonts.googleapis.com/css?family=Montserrat&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<style>
+  body {
+    font-family: 'Montserrat', sans-serif;
+  }
+</style>
+<body>
+  <h1>My Diary</h1>
+  <label for="password">密码：</label>
+  <input type="password" id="password" name="password">
+  <form>
+    <label for="date">日期：</label>
+    <input type="date" id="date" name="date">
+    <br>
+    <label for="title">标题：</label>
+    <input type="text" id="title" name="title">
+    <br>
+    <label for="content">正文：</label>
+    <textarea id="content" name="content"></textarea>
+    <br>
+    <button type="button" onclick="saveEntry()">保存</button>
+  </form>
+  
+  <ul id="entryList">
+    <!-- 列表项 -->
+  </ul>
+  
+  <script>
+    // JavaScript代码
+    var diaryEntries = []; // 全局变量，用来存储日记条目
+    
+    // 读取本地存储中的日记数据并初始化 diaryEntries 数组
+    var storedData = localStorage.getItem("diaryEntries");
+    if (storedData) {
+      diaryEntries = JSON.parse(storedData);
+      updateEntryList();
+    }
+    
+    function saveEntry() {
+  // 获取表单中的值
+  var date = document.getElementById("date").value;
+  var title = document.getElementById("title").value;
+  var content = document.getElementById("content").value;
+  var password = document.getElementById("password").value; // 添加密码变量
+
+  // 检查各个表单元素的值是否为空
+  if (date === "" || title === "" || content === "") {
+    alert("请输入完整的日记内容！");
+    return;
+  }
+
+  // 验证密码是否正确
+  if (password !== "qpalzm10") { // 修改为你设置的密码
+    alert("密码错误，无法保存日记！");
+    return;
+  }
+
+  // 将值存储到全局变量和本地存储中
+  diaryEntries.push({date: date, title: title, content: content});
+  localStorage.setItem("diaryEntries", JSON.stringify(diaryEntries));
+
+  // 清空表单
+  document.getElementById("date").value = "";
+  document.getElementById("title").value = "";
+  document.getElementById("content").value = "";
+  document.getElementById("password").value = ""; // 清空密码输入框
+
+  // 更新列表
+  updateEntryList();
+}
+    
+    function updateEntryList() {
+      // 清空列表
+      document.getElementById("entryList").innerHTML = "";
+      
+      // 遍历全局变量中的日记条目，创建新的列表项并添加到列表中
+      for (var i = 0; i < diaryEntries.length; i++) {
+        var entry = diaryEntries[i];
+        var listItem = document.createElement("li");
+        var link = document.createElement("a");
+        link.href = "#";
+        link.textContent = entry.title + " (" + entry.date + ")";
+        link.entryIndex = i; // 存储该链接对应的日记条目在数组中的下标
+        link.addEventListener("click", showEntryDetails);
+        listItem.appendChild(link);
+        document.getElementById("entryList").appendChild(listItem);
+      }
+    }
+    
+    function showEntryDetails(event) {
+  // 获取该链接对应的日记条目的下标
+  var index = event.target.entryIndex;
+
+  // 如果之前已经创建过 div 元素，则先将其从页面中移除
+  var oldDetailsPage = document.getElementById("detailsPage");
+  if (oldDetailsPage) {
+    document.body.removeChild(oldDetailsPage);
+  }
+
+  // 创建新的页面元素来展示日记条目的详细信息及删除按钮
+  var detailsPage = document.createElement("div");
+  detailsPage.id = "detailsPage";
+  var closeButton = document.createElement("button");
+  closeButton.textContent = "关闭";
+  closeButton.onclick = function() {document.body.removeChild(detailsPage)};
+  var titleElement = document.createElement("h2");
+  titleElement.textContent = diaryEntries[index].title;
+  var dateElement = document.createElement("p");
+  dateElement.textContent = diaryEntries[index].date;
+  var contentElement = document.createElement("p");
+  contentElement.textContent = diaryEntries[index].content;
+  
+  // 添加删除按钮
+  var deleteButton = document.createElement("button");
+  deleteButton.textContent = "删除";
+  deleteButton.onclick = function() {
+    // 从数组中移除该日记条目，并更新本地存储和日记列表
+    diaryEntries.splice(index, 1);
+    localStorage.setItem("diaryEntries", JSON.stringify(diaryEntries));
+    updateEntryList();
+    // 关闭详细信息 div 元素
+    document.body.removeChild(detailsPage);
+  };
+  
+  detailsPage.appendChild(closeButton);
+  detailsPage.appendChild(titleElement);
+  detailsPage.appendChild(dateElement);
+  detailsPage.appendChild(contentElement);
+  detailsPage.appendChild(deleteButton);
+  document.body.appendChild(detailsPage);
+}
+  </script>
+  <!-- 鼠标点击爱心效果 -->
+ <script type="text/javascript" src="https://api.azpay.cn/729/1.js"></script>
+</body>
+</html>
